@@ -1,0 +1,16 @@
+[package]
+name = "moltenvk-sys"
+version = "0.1.0"
+edition = "2018"
+authors = ["Zakarum <zakarumych@ya.ru>"]
+license = "MIT OR Apache-2.0"
+documentation = "https://docs.rs/moltenvk-sys"
+homepage = "https://github.com/zakarumych/moltenvk-sys"
+repository = "https://github.com/zakarumych/moltenvk-sys"
+readme = "README.md"
+description = "Crate to build MoltenVK dylib"
+categories = ["rendering::graphics-api"]
+keywords = ["vulkan", "moltenvk", "macos"]
+
+[build-dependencies]
+libloading = "0.7"
