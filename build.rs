@@ -1,20 +1,27 @@
 use std::{env::var_os, path::Path, process::Command};
 
 fn main() {
-    println!("cargo:rerun-if-env-changed=FORCE_BUILD_MVK");
+    println!("cargo:rerun-if-env-changed=FORCE_MVK_FROM_SOURCE");
 
-    let force_build = match var_os("FORCE_BUILD_MVK") {
+    let force = match var_os("FORCE_MVK_FROM_SOURCE") {
         None => false,
         Some(value) => value == "yes" || value == "1",
     };
 
-    let build = if force_build {
+    let use_from_source = if force {
         true
     } else {
         unsafe { libloading::Library::new("libvulkan.dylib").is_err() }
     };
 
-    if !build {
+    let out_dir = var_os("OUT_DIR").expect("Failed to find OUT_DIR");
+    let out_dir = Path::new(&out_dir);
+    let target_lib_path = out_dir.join("libvulkan.dylib");
+
+    if !use_from_source {
+        if target_lib_path.exists() {
+            let _ = std::fs::remove_file(&target_lib_path);
+        }
         return;
     }
 
@@ -81,8 +88,6 @@ fn main() {
         .join("dylib")
         .join(dylib_dir)
         .join("libMoltenVK.dylib");
-
-    let target_lib_path = out_dir.join("libvulkan.dylib");
 
     std::fs::copy(&dylib_path, &target_lib_path).expect("Failed to copy MoltenVK dylib");
     println!("cargo:rustc-link-search=native={}", out_dir.display());
